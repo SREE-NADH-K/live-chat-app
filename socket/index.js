@@ -1,10 +1,10 @@
 const { Server } = require("socket.io");
 
 const io = new Server({ cors:"http://localhost:3000" });
+
 let onlineUsers = [];
+
 io.on("connection", (socket) => {
-   console.log(socket.id);
-   
    socket.on("addNewUser",(userId)=>{
     !onlineUsers.some((obj)=>obj.userId===userId) &&
     onlineUsers.push({
@@ -12,7 +12,6 @@ io.on("connection", (socket) => {
         socketId:socket.id
     });
     io.emit("getOnlineUsers",onlineUsers);
-    //console.log(onlineUsers);
    })
    socket.on("disconnect",()=>{
      onlineUsers = onlineUsers.filter((item)=>item.socketId!==socket.id);
