@@ -5,7 +5,7 @@ import AuthContext from "../Context/AuthContext";
 import { getRequest,baseUrl, postRequest } from "../utils/service";
 import ChatBox from "../Components/ChatBox";
 import UserDiv from "../Components/UserDiv";
-import { Box } from "@mui/material";
+
 const Chat = ()=>{
    const {User,Users,onlineUsers} = useContext(AuthContext);
    const [chatList,SetChatList] = useState([]);
@@ -70,7 +70,7 @@ const Chat = ()=>{
                <div className="chat-list">
                 {chatList.map((element,index)=>(
                     <div key={index} onClick={(e)=>{handleChat(e,element)}}>
-                       <UserChat messages={messages}  element={element} onlineUsers={onlineUsers}/>
+                       <UserChat messages={messages}  element={element} onlineUsers={onlineUsers} />
                     </div>
                 ))}
                 

@@ -1,36 +1,61 @@
 import Avatar from '@mui/material/Avatar';
 import { baseUrl, getRequest } from '../utils/service';
-import { useState,useEffect } from 'react';
+import { useState,useEffect, useContext } from 'react';
 import { Typography,Box } from '@mui/material';
 import { green } from '@mui/material/colors';
 import moment from 'moment';
+import AuthContext from '../Context/AuthContext';
 
 
 const UserChat = ({messages,element,onlineUsers})=>{
+  const {socket} = useContext(AuthContext);
 
 
 const [chatUser,setChatUser] = useState({id:"",name:""});
-const [lastMessage,setLastMessage] = useState(null);
+const [lastMessage,setLastMessage] = useState("");
 
 
 const isOnline = (onlineUsers.some((item)=>item.userId===element.userId));
- 
-console.log(lastMessage)
 
 let {name} = chatUser;
+
+//recieve message , and set last message
+useEffect(()=>{
+  if(socket==null) return;
+  socket.on("getMessage",(res)=>{
+    
+    if(element?.chatId!==res.chatId) return;
+    let tmpMessage = res.message[res.message.length-1];
+    if(tmpMessage.text.length>12){
+      setLastMessage(tmpMessage.text.slice(0,12)+"....")
+    }
+    else{
+      setLastMessage(tmpMessage.text);
+    }
+  });
+ },[]);
+
   useEffect(()=>{
     if(element.userId){
       fetchChatUser();
       fetchMessage();
     }
   },[]);
+
+
+  //set last message when sending
   useEffect(()=>{
-    if(messages && messages[0]?.chatId===element.chatId){
+    if(messages[0] && messages[0].chatId===element.chatId){
       let message = messages[messages.length-1];
+      // minimize the message length
       if(message.text.length>12){
-        message.text = message.text.slice(0,12)+"....";
+        // message.text = message.text.slice(0,12)+"....";
+        setLastMessage(message.text.slice(0,12)+"....");
       }
-     setLastMessage(message);
+      else{
+        setLastMessage(message.text);
+      }
+ 
     }
   },[messages]);
 
@@ -38,10 +63,13 @@ let {name} = chatUser;
   async function fetchMessage(){
     let messageResponse = await getRequest(`${baseUrl}/message/get/${element.chatId}`);
     let message = messageResponse[messageResponse.length-1];
+    if(!message) return;
     if(message?.text.length>12){
-      message.text = message.text.slice(0,12)+"....";
+      setLastMessage(message.text.slice(0,12)+"....")
     }
-    setLastMessage(message);
+    else{
+      setLastMessage(message.text);
+    }
   }
 
 
@@ -66,7 +94,7 @@ let {name} = chatUser;
              <Box sx={{display:"flex",alignItems:"center"}}><Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg"/></Box>
             <Box sx={{marginLeft:"8px"}}>
               <Typography variant='h6' >{name}</Typography>
-              <Typography color={green} variant='h8'>{lastMessage? lastMessage.text:"no chat yet"}</Typography>
+              <Typography color={green} variant='h8'>{lastMessage? lastMessage:"no chat yet"}</Typography>
             </Box>
           </Box>
           <Box sx={{display:"flex",flexDirection:"column",justifyContent:"space-between"}}>

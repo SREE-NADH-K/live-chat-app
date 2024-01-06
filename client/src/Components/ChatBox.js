@@ -12,28 +12,43 @@ import AuthContext from "../Context/AuthContext";
 
 const ChatBox = ({reciever,messages,currChat,setMessages})=>{
  const {User,socket} = useContext(AuthContext);
-  const [message,setMessage] = useState();
+  const [message,setMessage] = useState("");
   const [tmpMessages,SetTmpMessages] = useState([]);
   const scrolRef = useRef(null);
+ 
   useEffect(()=>{
-  scrollToBottom();
-  },[tmpMessages])
-
+    scrollToBottom();
+  },[tmpMessages]);
+  
+  
    useEffect(()=>{
+    // recieve message 
     if(socket==null) return;
     socket.on("getMessage",(res)=>{
-      if(currChat?.chatId!==res.chatId) return;
-      SetTmpMessages([...res.message]);
+      console.log(currChat)
+      console.log(currChat?.chatId,res.chatId);
+      if(currChat && currChat.chatId===res.chatId){ // check it is belong to recipient
+         SetTmpMessages([...res.message]);
+         console.log("inside");
+      }
+      else{
+        console.log("fuck");
+      }
     });
    },[currChat]);
    
 
-
+ // for first rendering
   useEffect(()=>{
-    SetTmpMessages(messages);// 
+     if(messages[0] && currChat?.chatId===messages[0].chatId){
+      SetTmpMessages(messages);
+     }
+     else{
+      SetTmpMessages([]);
+     }
   },[messages])
-  // console.log(tmpMessages);
-
+ 
+  // handle message event
   async function handleMessage(){
     if(message.length>0){
     let res = await postRequest(`${baseUrl}/message/`,{chatId:currChat.chatId,senderId:User.id,text:message});
@@ -41,7 +56,7 @@ const ChatBox = ({reciever,messages,currChat,setMessages})=>{
        SetTmpMessages([...tmpMessages,res]);
        setMessage("");
      if(socket==null) return;
-    //console.log(currChat);
+   
     let recipientId = currChat?.userId;
     let chatId = currChat?.chatId;
     //trigger send message event
