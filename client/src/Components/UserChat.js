@@ -6,7 +6,7 @@ import { green } from '@mui/material/colors';
 import moment from 'moment';
 import AuthContext from '../Context/AuthContext';
 
-
+// chats
 const UserChat = ({messages,element,onlineUsers})=>{
   const {socket} = useContext(AuthContext);
 

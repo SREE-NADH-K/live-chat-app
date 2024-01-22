@@ -100,6 +100,8 @@ body{
 }
 .chat-list{
   width: 50%;
+  overflow:auto;
+  height: 500px;
 }
 .chat-box{
   background-color:#CFE8FC;
@@ -137,6 +139,18 @@ body{
 .user-div::-webkit-scrollbar {
   background-color: transparent;
 }
+.chat-list::-webkit-scrollbar {
+  width: 5px;
+  background-color: #6495ED;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+  border-radius: 20px;     
+  background-color: aliceblue;
+  /* creates padding around scroll thumb */
+   min-height: 40px;
+}
+
 /* Media query for screens with a maximum width of 600 pixels */
 @media screen and (max-width: 753px) {
   .chat-box{

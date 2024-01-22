@@ -9,12 +9,13 @@ import AuthContext from "../Context/AuthContext";
 
 
 
-
+// where all chats are contained
 const ChatBox = ({reciever,messages,currChat,setMessages})=>{
- const {User,socket} = useContext(AuthContext);
+  const {User,socket} = useContext(AuthContext);
   const [message,setMessage] = useState("");
   const [tmpMessages,SetTmpMessages] = useState([]);
   const scrolRef = useRef(null);
+  // console.log(reciever);
  
   useEffect(()=>{
     scrollToBottom();
@@ -24,15 +25,15 @@ const ChatBox = ({reciever,messages,currChat,setMessages})=>{
    useEffect(()=>{
     // recieve message 
     if(socket==null) return;
+  
     socket.on("getMessage",(res)=>{
-      console.log(currChat)
-      console.log(currChat?.chatId,res.chatId);
-      if(currChat && currChat.chatId===res.chatId){ // check it is belong to recipient
+      console.log(currChat);
+      console.log("currchat =" + reciever.id, "resChatid ="+res.recipientId);
+      if(currChat && currChat.chatId==res.chatId){ // check it is belong to recipient
          SetTmpMessages([...res.message]);
-         console.log("inside");
       }
       else{
-        console.log("fuck");
+        SetTmpMessages(messages);
       }
     });
    },[currChat]);
@@ -84,7 +85,7 @@ const ChatBox = ({reciever,messages,currChat,setMessages})=>{
          </Container>
 
          <Box ref={scrolRef} sx={{height:"80%",overflow:"auto"}}>
-            {tmpMessages && tmpMessages.map((element,index)=>(
+            {tmpMessages.length>0 && tmpMessages.map((element,index)=>(
             <div key={index} className={User.id===element.senderId?"message-container send":"message-container reciever"}>
                     
                     <div className="message ">
@@ -99,10 +100,8 @@ const ChatBox = ({reciever,messages,currChat,setMessages})=>{
             <div className="input-emoji"><InputEmoji value={message} onChange={setMessage} /></div>
             <div style={{marginRight:"5px",cursor:"pointer"}}><SendIcon onClick={handleMessage} /></div>
           </Box>
-
         </Box>
     )
-
 }
 
 export default ChatBox;
